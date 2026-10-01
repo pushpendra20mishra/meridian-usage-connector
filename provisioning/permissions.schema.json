@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rendered permissions manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "environment",
+    "server_name",
+    "scopes",
+    "capability_defaults"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "environment": {
+      "enum": [
+        "dev",
+        "staging",
+        "prod"
+      ]
+    },
+    "server_name": {
+      "type": "string",
+      "pattern": "^meridian-usage(-[a-z]+)?$"
+    },
+    "scopes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usage:read",
+        "capabilities:write"
+      ],
+      "properties": {
+        "usage:read": {
+          "$ref": "#/$defs/scope"
+        },
+        "capabilities:write": {
+          "$ref": "#/$defs/scope"
+        }
+      }
+    },
+    "capability_defaults": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "boolean"
+        },
+        "minProperties": 1
+      },
+      "required": [],
+      "description": "capability names are checked against the contract in render.ts"
+    }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roles",
+        "group_visibility",
+        "all_groups_roles"
+      ],
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "group_visibility": {
+          "enum": [
+            "own_group",
+            "all"
+          ]
+        },
+        "all_groups_roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

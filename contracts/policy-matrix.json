@@ -1,0 +1,286 @@
+{
+ "_doc": "Shared conformance cases. denied_by=capability_gate is enforced by the connector only (it is the assistant-surface switch); the service must allow those. Run by service/tests/test_policy_matrix.py and connector/test/matrix.test.ts.",
+ "cases": [
+  {
+   "env": "dev",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "allow"
+  },
+  {
+   "env": "dev",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "usage_summary",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "dev",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "clinical-operations",
+    "capability": "web-search",
+    "enabled": false
+   },
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "dev",
+   "user": "priya.nair@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "clinical-operations",
+    "capability": "web-search",
+    "enabled": false
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "dev",
+   "user": "priya.nair@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "finance",
+    "capability": "web-search",
+    "enabled": false
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "dev",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "finance",
+    "capability": "code-execution",
+    "enabled": true
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "staging",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "staging",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "capability_status",
+   "args": {},
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "allow"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "usage_summary",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "top_users",
+   "args": {
+    "group": "finance",
+    "limit": 5
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "capability_status",
+   "args": {
+    "group": "regulatory-affairs"
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "clinical-operations",
+    "capability": "code-execution",
+    "enabled": true
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "staging",
+   "user": "priya.nair@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "finance",
+    "capability": "code-execution",
+    "enabled": true
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "staging",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "usage_summary",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "staging",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "top_users",
+   "args": {
+    "group": "hr",
+    "limit": 3
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "prod",
+   "user": "daniel.okafor@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "allow"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "top_users",
+   "args": {
+    "limit": 5
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "usage_summary",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "top_users",
+   "args": {
+    "group": "hr"
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "capability_status",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "deny",
+   "denied_by": "visibility"
+  },
+  {
+   "env": "prod",
+   "user": "priya.nair@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "clinical-operations",
+    "capability": "web-search",
+    "enabled": false
+   },
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "prod",
+   "user": "kwame.mensah@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "it-platform",
+    "capability": "web-search",
+    "enabled": false
+   },
+   "expect": "deny",
+   "denied_by": "scope"
+  },
+  {
+   "env": "prod",
+   "user": "sofia.rossi@meridianls.example",
+   "tool": "usage_summary",
+   "args": {},
+   "expect": "deny",
+   "denied_by": "capability_gate"
+  },
+  {
+   "env": "prod",
+   "user": "sofia.rossi@meridianls.example",
+   "tool": "capability_status",
+   "args": {},
+   "expect": "deny",
+   "denied_by": "capability_gate"
+  },
+  {
+   "env": "prod",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "usage_summary",
+   "args": {
+    "group": "hr"
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "prod",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "capability_status",
+   "args": {
+    "group": "finance"
+   },
+   "expect": "allow"
+  },
+  {
+   "env": "prod",
+   "user": "chloe.dubois@meridianls.example",
+   "tool": "set_capability",
+   "args": {
+    "group": "hr",
+    "capability": "usage-connector",
+    "enabled": true
+   },
+   "expect": "allow"
+  }
+ ]
+}

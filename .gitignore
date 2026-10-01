@@ -1,0 +1,8 @@
+node_modules/
+var/
+build/
+bundle/
+*.sqlite
+.terraform/
+*.tfstate*
+.terraform.lock.hcl

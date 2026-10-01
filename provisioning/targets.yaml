@@ -1,0 +1,10 @@
+# deployment settings per env. grants live in environments/*.yaml
+plugin:
+  name: meridian-usage
+  version: 0.1.0
+  author: "Meridian Life Sciences platform team"
+  description: Usage and cost of Claude and Gemini for your Meridian team, inside the assistant.
+environments:
+  dev:     { service_url: "http://127.0.0.1:8081" }
+  staging: { service_url: "http://127.0.0.1:8082" }
+  prod:    { service_url: "http://127.0.0.1:8083" }

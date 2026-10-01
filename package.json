@@ -1,0 +1,34 @@
+{
+  "name": "meridian-usage-connector",
+  "version": "0.1.0",
+  "description": "Meridian usage service, admin page and scoped MCP connector (Node + TypeScript).",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "bundle": "esbuild src/connector/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=bundle/server.mjs --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
+    "render": "tsx src/provisioning/render.ts",
+    "serve": "tsx src/service/main.ts serve",
+    "ingest": "tsx src/service/main.ts ingest",
+    "inspect": "npx @modelcontextprotocol/inspector node bundle/server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.1",
+    "better-sqlite3": "^11.0.0",
+    "fastify": "^5.0.0",
+    "yaml": "^2.5.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
