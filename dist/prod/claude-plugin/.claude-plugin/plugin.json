@@ -1,0 +1,16 @@
+{
+  "name": "meridian-usage",
+  "version": "0.1.0",
+  "description": "Usage and cost of Claude and Gemini for your Meridian team, inside the assistant. (prod)",
+  "author": {
+    "name": "Meridian Life Sciences platform team"
+  },
+  "userConfig": {
+    "meridian_user": {
+      "type": "string",
+      "title": "Your Meridian email",
+      "description": "Directory user this connector runs as (simulated identity).",
+      "required": true
+    }
+  }
+}

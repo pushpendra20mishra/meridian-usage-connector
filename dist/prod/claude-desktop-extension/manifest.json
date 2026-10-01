@@ -1,0 +1,60 @@
+{
+  "manifest_version": "0.3",
+  "name": "meridian-usage",
+  "display_name": "Meridian usage (prod)",
+  "version": "0.1.0",
+  "description": "Usage and cost of Claude and Gemini for your Meridian team, inside the assistant.",
+  "author": {
+    "name": "Meridian Life Sciences platform team"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.mjs"
+      ],
+      "env": {
+        "MERIDIAN_ENV": "prod",
+        "MERIDIAN_SERVICE_URL": "http://127.0.0.1:8083",
+        "MERIDIAN_PERMISSIONS": "${__dirname}/permissions.json",
+        "MERIDIAN_DIRECTORY": "${__dirname}/directory",
+        "MERIDIAN_USER": "${user_config.meridian_user}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "usage_summary",
+      "description": "Tokens and cost for one group over a period, split by platform."
+    },
+    {
+      "name": "top_users",
+      "description": "Users in one group ranked by total tokens over a period."
+    },
+    {
+      "name": "capability_status",
+      "description": "Which capabilities are enabled for a group."
+    },
+    {
+      "name": "set_capability",
+      "description": "Enable or disable a capability for a group (platform admins)."
+    }
+  ],
+  "user_config": {
+    "meridian_user": {
+      "type": "string",
+      "title": "Your Meridian email",
+      "description": "Directory user this connector runs as (simulated identity).",
+      "required": true
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ]
+  }
+}

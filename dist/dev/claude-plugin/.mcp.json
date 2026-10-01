@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "meridian-usage-dev": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/server/index.mjs"
+      ],
+      "env": {
+        "MERIDIAN_ENV": "dev",
+        "MERIDIAN_SERVICE_URL": "http://127.0.0.1:8081",
+        "MERIDIAN_PERMISSIONS": "${CLAUDE_PLUGIN_ROOT}/permissions.json",
+        "MERIDIAN_DIRECTORY": "${CLAUDE_PLUGIN_ROOT}/directory",
+        "MERIDIAN_USER": "${user_config.meridian_user}"
+      }
+    }
+  }
+}

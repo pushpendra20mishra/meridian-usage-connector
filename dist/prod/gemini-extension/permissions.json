@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "environment": "prod",
+  "server_name": "meridian-usage",
+  "scopes": {
+    "usage:read": {
+      "roles": [
+        "platform_admin",
+        "team_lead"
+      ],
+      "group_visibility": "own_group",
+      "all_groups_roles": [
+        "platform_admin"
+      ]
+    },
+    "capabilities:write": {
+      "roles": [
+        "platform_admin"
+      ],
+      "group_visibility": "own_group",
+      "all_groups_roles": [
+        "platform_admin"
+      ]
+    }
+  },
+  "capability_defaults": {
+    "usage-connector": {
+      "clinical-operations": true,
+      "regulatory-affairs": false,
+      "finance": false,
+      "hr": false,
+      "medical-writing": false,
+      "it-platform": true
+    },
+    "web-search": {
+      "clinical-operations": true,
+      "regulatory-affairs": true,
+      "finance": true,
+      "hr": true,
+      "medical-writing": true,
+      "it-platform": true
+    },
+    "code-execution": {
+      "clinical-operations": false,
+      "regulatory-affairs": false,
+      "finance": false,
+      "hr": false,
+      "medical-writing": false,
+      "it-platform": false
+    }
+  }
+}

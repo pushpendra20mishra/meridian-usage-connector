@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "meridian-usage": {
+      "command": "node",
+      "args": [
+        "${INSTALL_ROOT}/bundle/server.mjs"
+      ],
+      "env": {
+        "MERIDIAN_ENV": "prod",
+        "MERIDIAN_SERVICE_URL": "http://127.0.0.1:8083",
+        "MERIDIAN_PERMISSIONS": "${INSTALL_ROOT}/dist/prod/permissions.json",
+        "MERIDIAN_DIRECTORY": "${INSTALL_ROOT}/data/directory",
+        "MERIDIAN_USER": "REPLACE_WITH_USER_EMAIL"
+      }
+    }
+  }
+}

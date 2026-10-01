@@ -1,0 +1,29 @@
+{
+  "name": "meridian-usage-dev",
+  "version": "0.1.0",
+  "description": "Usage and cost of Claude and Gemini for your Meridian team, inside the assistant. (dev)",
+  "contextFileName": "GEMINI.md",
+  "settings": [
+    {
+      "name": "Your Meridian email",
+      "description": "Directory user this connector runs as (simulated identity).",
+      "envVar": "MERIDIAN_USER"
+    }
+  ],
+  "mcpServers": {
+    "meridian-usage-dev": {
+      "command": "node",
+      "args": [
+        "${extensionPath}/server/index.mjs"
+      ],
+      "env": {
+        "MERIDIAN_ENV": "dev",
+        "MERIDIAN_SERVICE_URL": "http://127.0.0.1:8081",
+        "MERIDIAN_PERMISSIONS": "${extensionPath}/permissions.json",
+        "MERIDIAN_DIRECTORY": "${extensionPath}/directory",
+        "MERIDIAN_USER": "$MERIDIAN_USER"
+      },
+      "cwd": "${extensionPath}"
+    }
+  }
+}
