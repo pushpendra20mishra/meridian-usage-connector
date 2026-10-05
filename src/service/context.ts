@@ -36,12 +36,10 @@ function callerOf(ctx: AppContext, header: string | string[] | undefined): User 
   return user;
 }
 
-// everything under /api/v1 needs a known, active caller, except the list that feeds the user switcher
-export function identifyCallers(app: FastifyInstance, ctx: AppContext) {
-  app.decorateRequest("caller");
+// every route registered inside this scope needs a known, active caller, however its url is spelled
+export function requireCaller(app: FastifyInstance, ctx: AppContext) {
   app.addHook("preHandler", async (req) => {
-    const path = req.url.split("?")[0];
-    if (path?.startsWith("/api/v1/") && path !== "/api/v1/identities") req.caller = callerOf(ctx, req.headers["x-meridian-user"]);
+    req.caller = callerOf(ctx, req.headers["x-meridian-user"]);
   });
 }
 

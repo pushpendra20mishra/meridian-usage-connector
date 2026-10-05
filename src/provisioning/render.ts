@@ -86,8 +86,9 @@ export function buildManifest(env: string, rawSpec: unknown, groupIds: string[])
 
 const subset = (a: string[], b: string[]) => a.every((x) => b.includes(x));
 
-export function validateManifest(env: string, m: Manifest, directoryRoles: Set<string>, groupIds: string[], contractCaps: string[]): void {
-  const schema = JSON.parse(readFileSync(`${ROOT}/provisioning/permissions.schema.json`, "utf8"));
+export const loadManifestSchema = (): object => JSON.parse(readFileSync(`${ROOT}/provisioning/permissions.schema.json`, "utf8"));
+
+export function validateManifest(env: string, m: Manifest, directoryRoles: Set<string>, groupIds: string[], contractCaps: string[], schema: object = loadManifestSchema()): void {
   const validate = new Ajv({ allErrors: true, strict: false }).compile(schema);
   const errs: string[] = [];
   if (!validate(m)) for (const e of validate.errors ?? []) errs.push(`${env}: ${e.instancePath || "<root>"}: ${e.message}`);
@@ -209,6 +210,7 @@ function loadInputs() {
   return {
     groupIds: (json("data/directory/groups.json").groups as { group_id: string }[]).map((g) => g.group_id),
     roles: new Set(Object.keys(json("data/directory/users.json").roles)),
+    manifestSchema: loadManifestSchema(),
     contractCaps: json("contracts/tools.schema.json").$defs.Capability.enum as string[],
     targets: parseFile(targetsFile, parse(readFileSync(`${ROOT}/provisioning/targets.yaml`, "utf8")), "targets.yaml"),
     specs: (env: string) => parse(readFileSync(`${ROOT}/environments/${env}.yaml`, "utf8")) as unknown,
@@ -216,7 +218,7 @@ function loadInputs() {
 }
 
 export function renderAll(out: string, root: string, only?: string[]): void {
-  const { groupIds, roles, contractCaps, targets, specs } = loadInputs();
+  const { groupIds, roles, contractCaps, manifestSchema, targets, specs } = loadInputs();
 
   const unknown = (only ?? []).filter((e) => !(ENVS as readonly string[]).includes(e));
   if (unknown.length) throw new ValidationError(`unknown environment(s): ${JSON.stringify(unknown.sort())}`);
@@ -225,7 +227,7 @@ export function renderAll(out: string, root: string, only?: string[]): void {
   const manifests = new Map<string, Manifest>();
   for (const env of ENVS) {
     const m = buildManifest(env, specs(env), groupIds);
-    validateManifest(env, m, roles, groupIds, contractCaps);
+    validateManifest(env, m, roles, groupIds, contractCaps, manifestSchema);
     manifests.set(env, m);
   }
   const names = [...manifests.values()].map((m) => m.server_name);

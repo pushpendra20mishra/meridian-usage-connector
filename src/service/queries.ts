@@ -79,8 +79,13 @@ export function topUsers(db: Db, rng: DateRange, group: string, limit: number, n
      WHERE ${r.sql} AND group_id = ? GROUP BY user_id, group_id ORDER BY tokens DESC, user_id LIMIT ?`,
     [...r.args, group, limit],
   );
-  return rows.map((x) => ({ user_id: x.user_id, name: names.get(x.user_id)!.name, email: names.get(x.user_id)!.email, group: x.group_id, total_tokens: x.tokens, cost_usd: nanoToUsd(x.cost) }));
+  return rows.map((x) => {
+    const who = names.get(x.user_id)!;
+    return { user_id: x.user_id, name: who.name, email: who.email, group: x.group_id, total_tokens: x.tokens, cost_usd: nanoToUsd(x.cost) };
+  });
 }
+
+const NO_USAGE: Split & { tokens: number; cost: number } = { tokens: 0, cost: 0, claude_tokens: 0, claude_cost: 0, gemini_tokens: 0, gemini_cost: 0 };
 
 export function byUser(db: Db, rng: DateRange, members: readonly { userId: string; name: string; email: string; role: string }[], group: string) {
   const r = range(rng);
@@ -93,8 +98,8 @@ export function byUser(db: Db, rng: DateRange, members: readonly { userId: strin
   );
   return members
     .map((m) => {
-      const x = rows.get(m.userId) ?? ({ tokens: 0, cost: 0 } as Split & { tokens: number; cost: number });
-      return { user_id: m.userId, name: m.name, email: m.email, role: m.role, group, ...bothPlatforms(x), total_tokens: x.tokens ?? 0, cost_usd: nanoToUsd(x.cost ?? 0) };
+      const x = rows.get(m.userId) ?? NO_USAGE;
+      return { user_id: m.userId, name: m.name, email: m.email, role: m.role, group, ...bothPlatforms(x), total_tokens: x.tokens, cost_usd: nanoToUsd(x.cost) };
     })
     .sort((a, b) => b.total_tokens - a.total_tokens || a.name.localeCompare(b.name));
 }

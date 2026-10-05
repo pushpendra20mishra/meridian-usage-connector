@@ -5,7 +5,8 @@ import { one } from "../db.js";
 
 const asset = (name: string) => readFileSync(new URL(`../static/${name}`, import.meta.url), "utf8");
 
-export function metaRoutes(app: FastifyInstance, ctx: AppContext) {
+// open on purpose: the page itself, health, and the list behind the user switcher
+export function publicRoutes(app: FastifyInstance, ctx: AppContext) {
   const page = (_: unknown, reply: FastifyReply) => reply.type("text/html; charset=utf-8").send(asset("admin.html"));
   app.get("/", page);
   app.get("/admin", page);
@@ -21,7 +22,9 @@ export function metaRoutes(app: FastifyInstance, ctx: AppContext) {
     default_user: ctx.uiDefaultUser,
     users: ctx.directory.users.map((u) => ({ user_id: u.userId, email: u.email, name: u.name, role: u.role, groups: u.groupIds })),
   }));
+}
 
+export function sessionRoutes(app: FastifyInstance, ctx: AppContext) {
   app.get("/api/v1/me", async (req) => {
     const user = req.caller;
     const { policy, directory } = ctx;

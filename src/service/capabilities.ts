@@ -28,17 +28,24 @@ export class CapabilityStore {
     private clock: () => string = now,
   ) {}
 
-  status(group: string): CapabilityState[] {
+  // one query for any number of groups, rows come back in policy capability order
+  private statesFor(groups: readonly string[]): Map<string, CapabilityState[]> {
+    const byGroup = new Map<string, CapabilityState[]>(groups.map((g) => [g, []]));
+    if (!groups.length) return byGroup;
     const rows = all<{ group_id: string; capability: string; enabled: number; updated_at: string | null; updated_by: string | null }>(
       this.db,
-      "SELECT group_id, capability, enabled, updated_at, updated_by FROM capability WHERE group_id = ?",
-      [group],
+      `SELECT group_id, capability, enabled, updated_at, updated_by FROM capability WHERE group_id IN (${groups.map(() => "?").join(",")})`,
+      [...groups],
     );
     const order = new Map(this.capabilities.map((c, i) => [c, i]));
-    return rows
-      .filter((r) => order.has(r.capability))
-      .sort((a, b) => order.get(a.capability)! - order.get(b.capability)!)
-      .map((r) => ({ group: r.group_id, capability: r.capability, enabled: !!r.enabled, updated_at: r.updated_at, updated_by: r.updated_by }));
+    for (const r of rows.filter((r) => order.has(r.capability)).sort((a, b) => order.get(a.capability)! - order.get(b.capability)!)) {
+      byGroup.get(r.group_id)!.push({ group: r.group_id, capability: r.capability, enabled: !!r.enabled, updated_at: r.updated_at, updated_by: r.updated_by });
+    }
+    return byGroup;
+  }
+
+  status(group: string): CapabilityState[] {
+    return this.statesFor([group]).get(group)!;
   }
 
   set(group: string, capability: string, enabled: boolean, by: string): CapabilityState {
@@ -54,6 +61,7 @@ export class CapabilityStore {
   }
 
   matrix(groups: readonly string[]) {
-    return groups.map((g) => ({ group: g, capabilities: Object.fromEntries(this.status(g).map((s) => [s.capability, s])) }));
+    const states = this.statesFor(groups);
+    return groups.map((g) => ({ group: g, capabilities: Object.fromEntries(states.get(g)!.map((s) => [s.capability, s])) }));
   }
 }

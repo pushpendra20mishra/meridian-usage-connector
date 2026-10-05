@@ -46,6 +46,39 @@ describe("every protected endpoint refuses an unidentified caller", () => {
   });
 });
 
+describe("the identity check cannot be skipped by how the path is written", () => {
+  const send = async (c: Awaited<ReturnType<typeof makeClient>>, url: string, user?: string) => {
+    const r = await c.app.inject({ method: "GET", url, headers: user ? { "x-meridian-user": user } : {} });
+    return { status: r.statusCode, body: r.body };
+  };
+  const SPELLINGS = ["/%61pi/v1/usage/summary?period=2026-08", "/api/v1/usage/summary/?period=2026-08", "/api/%76%31/usage/summary?period=2026-08"];
+
+  it.each(SPELLINGS)("%s with no identity is a clean 401, never a 500 or data", async (url) => {
+    const r = await send(await makeClient("prod"), url);
+    expect([401, 404]).toContain(r.status);
+    expect(r.body).not.toMatch(/total_tokens|cost_usd/);
+  });
+
+  it("an encoded admin path with no identity is not reachable either", async () => {
+    const r = await send(await makeClient("prod"), "/%61pi/v1/admin/audit");
+    expect([401, 404]).toContain(r.status);
+  });
+
+  it("an encoded path with a team lead still gets the normal group check", async () => {
+    const c = await makeClient("prod");
+    const other = await send(c, "/%61pi/v1/usage/summary?period=2026-08&group=finance", LEAD);
+    expect([403, 404]).toContain(other.status);
+    expect(other.body).not.toMatch(/total_tokens|cost_usd/);
+  });
+
+  it("no route under /api/v1 ever answers 500 for a missing identity", async () => {
+    const c = await makeClient("prod");
+    for (const url of ["/api/v1/me", "/api/v1/capabilities/self", "/api/v1/admin/data-health", "/api/v1/admin/users/suspensions"]) {
+      expect((await send(c, url)).status, url).toBe(401);
+    }
+  });
+});
+
 describe("identity switcher", () => {
   it("lists directory users, with no default unless configured", async () => {
     const body = (await (await makeClient("prod")).get("/api/v1/identities")).json;

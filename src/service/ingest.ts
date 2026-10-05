@@ -146,6 +146,8 @@ export function write(db: Db, result: IngestResult): void {
   })();
 }
 
+export const needsIngest = (db: Db): boolean => !db.prepare("SELECT 1 FROM usage_fact LIMIT 1").get();
+
 export function run(db: Db, dataDir: string, directory: Directory): IngestResult {
   const result = build(dataDir, directory);
   write(db, result);

@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { AuditLog } from "./audit.js";
 import { CapabilityStore, seedDefaults } from "./capabilities.js";
 import { type Settings } from "./config.js";
-import { type AppContext, identifyCallers } from "./context.js";
+import { type AppContext, requireCaller } from "./context.js";
 import { HttpError } from "./http.js";
 import { openDb } from "./db.js";
 import * as ingest from "./ingest.js";
@@ -14,14 +14,14 @@ import { UserAdmin } from "./users.js";
 import { adminRoutes } from "./routes/admin.js";
 import { userRoutes } from "./routes/users.js";
 import { capabilityRoutes } from "./routes/capabilities.js";
-import { metaRoutes } from "./routes/meta.js";
+import { publicRoutes, sessionRoutes } from "./routes/meta.js";
 import { usageRoutes } from "./routes/usage.js";
 
 export async function createApp(settings: Settings) {
   const directory = loadDirectory(`${settings.dataDir}/directory`);
   const policy = new Policy(JSON.parse(readFileSync(settings.permissionsPath, "utf8")));
   const db = openDb(settings.dbPath);
-  if (!db.prepare("SELECT 1 FROM usage_fact LIMIT 1").get()) ingest.run(db, settings.dataDir, directory);
+  if (ingest.needsIngest(db)) ingest.run(db, settings.dataDir, directory);
   seedDefaults(db, policy, directory.groupIds);
 
   const names = new Map(directory.users.map((u) => [u.userId, { name: u.name, email: u.email }]));
@@ -46,8 +46,12 @@ export async function createApp(settings: Settings) {
   });
   app.addHook("onClose", async () => { db.close(); });
 
-  identifyCallers(app, ctx);
-  for (const register of [metaRoutes, usageRoutes, capabilityRoutes, adminRoutes, userRoutes]) register(app, ctx);
+  app.decorateRequest("caller");
+  publicRoutes(app, ctx);
+  app.register(async (protectedScope) => {
+    requireCaller(protectedScope, ctx);
+    for (const register of [sessionRoutes, usageRoutes, capabilityRoutes, adminRoutes, userRoutes]) register(protectedScope, ctx);
+  });
   await app.ready();
   return app;
 }

@@ -20,7 +20,7 @@ const summary = {
   ],
   totals: { total_tokens: 5, cost_usd: 2 },
 };
-const happy = (method: string, path: string) => {
+const happy = (_method: string, path: string) => {
   if (path.startsWith("/api/v1/capabilities/self")) return allEnabled();
   if (path.startsWith("/api/v1/usage/summary")) return { status: 200, body: summary };
   return { status: 200, body: [] };
@@ -169,7 +169,7 @@ describe("admin write", () => {
 
 describe("failure handling is closed", () => {
   it("service errors become a structured error, never partial data", async () => {
-    const c = await connect("prod", LEAD, new FakeService((m, p) => (p.includes("/self") ? allEnabled() : { status: 500, body: { detail: "boom" } })));
+    const c = await connect("prod", LEAD, new FakeService((_m, p) => (p.includes("/self") ? allEnabled() : { status: 500, body: { detail: "boom" } })));
     const r = await c.callTool({ name: "usage_summary", arguments: { period: "2026-08" } });
     expect(r.isError).toBe(true);
     expect(text(r).error).toBe("service_error");
@@ -184,7 +184,7 @@ describe("failure handling is closed", () => {
 
   it("a service-side 403 is passed through as the same denial shape", async () => {
     const denial = { error: "permission_denied", reason: "nope", required_scope: "usage:read" };
-    const c = await connect("dev", LEAD, new FakeService((m, p) => (p.includes("/self") ? allEnabled() : { status: 403, body: denial })));
+    const c = await connect("dev", LEAD, new FakeService((_m, p) => (p.includes("/self") ? allEnabled() : { status: 403, body: denial })));
     const r = await c.callTool({ name: "usage_summary", arguments: { period: "2026-08" } });
     expect(text(r)).toEqual(denial);
   });
